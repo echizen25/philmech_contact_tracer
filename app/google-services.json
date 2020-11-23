@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "877211559761",
+    "firebase_url": "https://profileid-4085c.firebaseio.com",
+    "project_id": "profileid-4085c",
+    "storage_bucket": "profileid-4085c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:877211559761:android:67a4f470ff2c4d7ebf5570",
+        "android_client_info": {
+          "package_name": "com.example.philmechlocator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "877211559761-5hl26cfvjkik479vceensdg79vkpgifl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBG_3psxLykNBy7wyPtzxtvOWpsAelnAJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "877211559761-5hl26cfvjkik479vceensdg79vkpgifl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

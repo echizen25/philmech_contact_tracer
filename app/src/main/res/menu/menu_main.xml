@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_logout"
+        android:icon="@drawable/ic_baseline_undo_24"
+        android:title="Logout"
+        app:showAsAction="collapseActionView|withText" />
+
+    <item
+        android:id="@+id/update"
+        android:icon="@drawable/ic_baseline_system_update_24"
+        android:title="Update To Latest Version"
+        android:visible="true"
+        app:showAsAction="collapseActionView|withText" />
+
+</menu>
