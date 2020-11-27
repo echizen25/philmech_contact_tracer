@@ -1,10 +1,12 @@
 package com.example.philmechlocator;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -53,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static byte[] getSHA(String input) throws NoSuchAlgorithmException
     {
         // Static getInstance method is called with hashing SHA
@@ -97,6 +100,7 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         protected String doInBackground(String... strings) {
             String username = usernamelogin.getText().toString();

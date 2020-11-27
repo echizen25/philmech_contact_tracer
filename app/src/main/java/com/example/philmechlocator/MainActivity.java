@@ -1,3 +1,4 @@
+
 package com.example.philmechlocator;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,10 +37,12 @@ import android.os.StrictMode;
 import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -56,7 +60,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -73,6 +77,7 @@ import com.journeyapps.barcodescanner.CaptureActivity;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int FIRST_REQUEST_CODE = 1;
     private static final int SECODE_REQUEST_CODE =2 ;
+    public static final String version = "version_3";
     private ImageView profilePic;
     public Uri imageUri;
     private FirebaseStorage storage;
@@ -96,7 +101,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SimpleAdapter ADAhere;
     TextView stat;
     TextView gender;
-    Menu update;
+
+    TextView log_Date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,8 +118,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         division = findViewById(R.id.division);
         datetime = findViewById(R.id.datetime);
         stat = findViewById(R.id.stat);
-        update = findViewById(R.id.update);
 
+        log_Date = findViewById(R.id.times);
         gender = findViewById(R.id.gender);
         ImageView sex = (ImageView)findViewById(R.id.sex);
         status = findViewById(R.id.status);
@@ -162,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         FillTextBox();
         FillCurrentLoc();
+        checkVersion();
 
         String getsex = "";
         getsex = gender.getText().toString();
@@ -172,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             sex.setImageResource(R.mipmap.avatar2);
         }
 
-}
+    }
 
 
     private void choosePicture() {
@@ -191,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             super.onPreExecute();
             Toast.makeText(MainActivity.this, "Please wait...", Toast.LENGTH_SHORT)
                     .show();
-
         }
 
         @Override
@@ -218,7 +224,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ADAhere = new SimpleAdapter(MainActivity.this, data,
                         R.layout.list_logs, fromwhere, viewswhere);
 
-                
             } catch (Exception e) {
                 e.printStackTrace();
 
@@ -235,9 +240,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+        FillTextBox();
         updateDb();
         scanCode();
+    }
+    public void checkVersion(){
+        try {
 
+            dtrdb2 = connectionClass(DtrConnect.un.toString(), DtrConnect.pass.toString(), DtrConnect.db.toString(), DtrConnect.ip.toString());
+
+            String query = "select top 1 version from android_version order by version_id desc";
+            PreparedStatement stmt = dtrdb2.prepareStatement(query);
+            ResultSet rs3 = stmt.executeQuery();
+            if (!rs3.next()) {
+
+                Toast.makeText(getApplicationContext(), "Ok", Toast.LENGTH_LONG).show();
+            }
+            else{
+                try {
+
+                    if(rs3.getString("version").equals(version)){
+                        Toast.makeText(getApplicationContext(), "Your app is up to Date", Toast.LENGTH_LONG).show();
+                    }
+                    else{
+                        showCustomDialog();
+                    }
+
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    private void showCustomDialog() {
+        //before inflating the custom alert dialog layout, we will get the current activity viewgroup
+        ViewGroup viewGroup = findViewById(android.R.id.content);
+
+        //then we will inflate the custom alert dialog xml that we created
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.customdialog, viewGroup, false);
+
+
+        //Now we need an AlertDialog.Builder object
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        //setting the view of the builder to our custom view that we already inflated
+
+        builder.setView(dialogView);
+        Button buttonOK = (Button) dialogView.findViewById(R.id.buttonOk);
+        builder.setCancelable(false);
+        buttonOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent viewIntent =
+                        new Intent("android.intent.action.VIEW",
+                                Uri.parse("https://www.philmech.gov.ph/download/android/tracer_app/PHilmech_Contact_Tracer_App.apk"));
+                startActivity(viewIntent);
+            }
+        });
+        //finally creating the alert dialog and displaying it
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     public void scanCode() {
@@ -323,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                       pd.dismiss();
+                        pd.dismiss();
                         Toast.makeText(getApplicationContext(), "Failed to Upload!", Toast.LENGTH_LONG).show();
 
                     }
@@ -342,33 +409,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void saveToDb() {
         try {
             dtrdb = connectionClass(DtrConnect.un.toString(), DtrConnect.pass.toString(), DtrConnect.db.toString(), DtrConnect.ip.toString());
-            if (dtrdb == null) {
+            if (dtrdb == null ) {
 
                 status.setTextColor(Color.RED);
                 status.setText("app_Response: No Internet Connection. Data not saved");
 
             } else {
-                String location = result.getText().toString();
-                String[] verify = {"PMITD", "PMITD-PPDS", "PMITD-EMSS", "PMITD-ICTS(NETWORK MAINTENANCE UNIT)", "PMITD-ICTS(SYS. DEVELOPMENT UNIT)", "PMITD-ICTS SECTION CHIEF", "HRMS",
-                        "FPD", "FMFOD", "FD", "EXECUTIVE LOUNGE", "EDD","DORMITORY","STORAGE","CASHIER","COA","DORMITORY","CANTEEN","BMTSS","BPED","AMD","AUDITORIUM","AICU","ACD","AMD FABRICATION SHOP","OD III","PMITD-DIVISION CHIEF OFFICE" +
-                        "PPS","TRAINING HALL","OD1", "LSD","SEPRD","OD","TMTD","PMITD-PPDS SECTION CHIEF","PMITD-EMSS SECTION CHIEF"};
-                for (int i = 0; i < verify.length ; i++) {
-                    if (verify[i].equals(result.getText().toString())) {
-                        String sql = "INSERT INTO location_logs (memcode,log_date_time,specify_location,current_status) VALUES ('" + memcode.getText() + "','" + datetime.getText() + "','" + result.getText() + "','True')";
-                        stmt = dtrdb.createStatement();
-                        stmt.executeUpdate(sql);
-                        status.setTextColor(Color.RED);
-                        status.setText("Data Has Been Saved to the Server");
-                        break;
-                    } else {
 
-                        status.setTextColor(Color.RED);
-                        status.setText("QR CODE INVALID");
-                    }
-                }
+                            String sql = "INSERT INTO location_logs (memcode,log_date_time,specify_location,current_status) VALUES ('" + memcode.getText() + "','" + datetime.getText() + "','" + result.getText() + "','True')";
+                            stmt = dtrdb.createStatement();
+                            stmt.executeUpdate(sql);
+                            status.setTextColor(Color.RED);
+                            status.setText("Data has been saved to the server");
+                            checkVersion();
+                        }
 
 
-            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -383,32 +439,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             } else {
 
-                String[] verify1 = {"PMITD", "PMITD-PPDS","PMITD-EMSS", "EMSS", "PMITD-ICTS(NETWORK MAINTENANCE UNIT)", "PMITD-ICTS(SYS. DEVELOPMENT UNIT)", "PMITD-ICTS SECTION CHIEF", "HRMS",
-                        "FPD", "FMFOD", "FD", "EXECUTIVE LOUNGE", "EDD","DORMITORY","STORAGE","CASHIER","COA","DORMITORY","CANTEEN","BMTSS","BPED","AMD","AUDITORIUM","AICU","ACD","AMD FABRICATION SHOP","OD III","PMITD-DIVISION CHIEF OFFICE" +
-                        "PPS","TRAINING HALL","OD1", "LSD","SEPRD","OD","TMTD","PMITD-PPDS SECTION CHIEF","PMITD-EMSS SECTION CHIEF"};
-                for (int i = 0; i < verify1.length; i++) {
-                    if (verify1[i].equals(result.getText().toString())) {
-                        String dates = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
-                        String sql = "UPDATE location_logs set log_out_date_time = '" + dates + "' ,current_status = 'False' where loc_id= ( SELECT TOP 1 loc_id FROM location_logs where memcode ='" + memcode.getText() + "'  ORDER BY log_date_time DESC) ";
-                        stmt = dtrdb.createStatement();
-                        stmt.executeUpdate(sql);
-                        status.setTextColor(Color.RED);
-                        status.setText("updated");
+                String dates = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+                String currentdate = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+                String prevdate = (log_Date.getText().toString());
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date newDate = format.parse(prevdate);
+                format = new SimpleDateFormat("yyyy-MM-dd");
+                String prevdates = format.format(newDate);
 
-                        break;
-                    } else {
+                if (prevdates.equals(currentdate)){
+                String sql = "UPDATE location_logs set log_out_date_time = '" + dates + "' ,current_status = 'False' where loc_id= ( SELECT TOP 1 loc_id FROM location_logs where memcode ='" + memcode.getText() + "'  ORDER BY log_date_time DESC) ";
+                stmt = dtrdb.createStatement();
+                stmt.executeUpdate(sql);
+                status.setTextColor(Color.RED);
+                status.setText("updated");
 
-                        status.setTextColor(Color.RED);
-                        status.setText("QR CODE INVALID");
-                    }
-                }
+               }
+                           else{
+                   String sql = "UPDATE location_logs set log_out_date_time = NULL ,current_status = 'False' where loc_id= ( SELECT TOP 1 loc_id FROM location_logs where memcode ='" + memcode.getText() + "'  ORDER BY log_date_time DESC) ";
+                   stmt = dtrdb.createStatement();
+                   stmt.executeUpdate(sql);
+                   status.setTextColor(Color.RED);
+                   status.setText("updated");
+               }
             }
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-
     public void FillTextBox() {
         try {
 
@@ -445,7 +504,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             dtrdb2 = connectionClass(DtrConnect.un.toString(), DtrConnect.pass.toString(), DtrConnect.db.toString(), DtrConnect.ip.toString());
 
-            String query = "select top 1 specify_location from location_logs where memcode ='" + memcode.getText() + "' order by log_date_time DESC ";
+            String query = "select top 1 specify_location,log_date_time from location_logs where memcode ='" + memcode.getText() + "' order by log_date_time DESC ";
             PreparedStatement stmt = dtrdb2.prepareStatement(query);
             ResultSet rs2 = stmt.executeQuery();
             if (!rs2.next()) {
@@ -455,7 +514,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             else{
                 try {
                     result.setText(rs2.getString("specify_location"));
+                    log_Date.setText((rs2.getString("log_date_time")));
                     stat.setText("Recent Location:");
+
 
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -499,11 +560,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 sessionManager = new SessionManager(getApplicationContext());
                 sessionManager.logoutUser();
                 return true;
-            case R.id.update:
-                Intent viewIntent = new Intent("android.intent.action.VIEW",Uri.parse("https://www.philmech.gov.ph/download/android/tracer_app/PHilmech_Contact_Tracer_App.apk"));
-                startActivity(viewIntent);
-                return true;
-
 
 
             default:
@@ -511,5 +567,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 }
-
 

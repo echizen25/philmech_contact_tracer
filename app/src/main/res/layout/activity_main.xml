@@ -24,7 +24,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.602"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"/>
 
     <EditText
         android:id="@+id/memcode"
@@ -37,6 +37,7 @@
         android:ems="10"
         android:enabled="false"
         android:fontFamily="@font/aspergit"
+        android:gravity="center|left"
         android:hint="MEMCODE"
         android:paddingBottom="2sp"
         android:textColor="#000000"
@@ -84,6 +85,7 @@
         android:textColor="#000000"
         android:textSize="10sp"
         android:textStyle="bold"
+        android:gravity="center|left"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/memcode"
         app:layout_constraintHorizontal_bias="0.006"
@@ -144,8 +146,8 @@
 
     <ImageButton
         android:id="@+id/btnFetch"
-        android:layout_width="54dp"
-        android:layout_height="52dp"
+        android:layout_width="49dp"
+        android:layout_height="50dp"
         android:layout_marginBottom="144dp"
         android:background="@drawable/location_history_icon"
         android:tint="#000000"
@@ -161,17 +163,16 @@
     <ListView
         android:id="@+id/listlogs"
         style="@style/Widget.AppCompat.Light.ListView.DropDown"
-        android:layout_width="359dp"
-        android:layout_height="152dp"
+        android:layout_width="370dp"
+        android:layout_height="136dp"
         android:background="@drawable/outlines"
         android:cacheColorHint="@android:color/transparent"
         android:scrollbarStyle="insideOverlay"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.461"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.976" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <EditText
         android:id="@+id/division"
@@ -187,6 +188,7 @@
         android:text="Name"
         android:textColor="#000000"
         android:textSize="10sp"
+        android:gravity="center|left"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/datetime"
@@ -211,6 +213,7 @@
         android:textColor="#000000"
         android:textSize="10sp"
         android:textStyle="bold"
+        android:gravity="center|left"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/division"
         app:layout_constraintHorizontal_bias="0.006"
@@ -323,6 +326,29 @@
         app:layout_constraintHorizontal_bias="0.528"
         app:layout_constraintStart_toStartOf="@+id/sex"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/times"
+        android:layout_width="120dp"
+        android:layout_height="24dp"
+        android:background="@android:color/transparent"
+        android:drawableLeft="@mipmap/eq"
+        android:enabled="false"
+
+        android:fontFamily="@font/aspergit"
+        android:gravity="center|left"
+        android:inputType="textPersonName"
+        android:lineSpacingExtra="2sp"
+        android:text="Log_date"
+        android:textColor="#000000"
+        android:textSize="8sp"
+        app:layout_constraintBottom_toBottomOf="@+id/divider"
+        app:layout_constraintEnd_toEndOf="@+id/gender"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gender"
+        app:layout_constraintVertical_bias="0.311" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
