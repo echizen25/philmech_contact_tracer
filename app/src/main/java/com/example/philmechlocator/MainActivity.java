@@ -27,7 +27,9 @@ import java.util.UUID;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
@@ -80,9 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final String version = "version_3";
     private ImageView profilePic;
     public Uri imageUri;
-    private FirebaseStorage storage;
     private StorageReference storageReference;
-    private DatabaseReference mDatabase;
     Button scanBtn;
     SessionManager sessionManager;
     Connection con;
@@ -101,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SimpleAdapter ADAhere;
     TextView stat;
     TextView gender;
-
     TextView log_Date;
+    DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         division = findViewById(R.id.division);
         datetime = findViewById(R.id.datetime);
         stat = findViewById(R.id.stat);
-
         log_Date = findViewById(R.id.times);
         gender = findViewById(R.id.gender);
         ImageView sex = (ImageView)findViewById(R.id.sex);
@@ -130,10 +129,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         scanBtn = findViewById(R.id.button);
         scanBtn.setOnClickListener(this);
         profilePic = findViewById(R.id.sex);
-
-        storage = FirebaseStorage.getInstance();
+        //storage upload
         storageReference = FirebaseStorage.getInstance().getReference().child("images");
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("images");
 
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,10 +149,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-
         lstData = (ListView) findViewById(R.id.listlogs);
 
         String string2 = (String) sessionManager.getUserDetails().get((Object) "username");
+        String string3 = (String) sessionManager.getUserDetails().get((Object) "memcode");
+        String string4 = (String) sessionManager.getUserDetails().get((Object) "gender");
         if (string2 != null) {
             TextView textView = this.lblUsername;
             StringBuilder stringBuilder = new StringBuilder();
@@ -166,21 +164,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             this.username = string2;
         }
 
+        if (string3 != null) {
+            memcode.setText(string3);
+        }
+        if (string4 != null){
+            if(string4.equals("M")) {
+                gender.setText("Male");
+                sex.setImageResource(R.mipmap.avatar1);
+            }
+            else {
+                gender.setText("Female");
+                sex.setImageResource(R.mipmap.avatar2);
+            }
+
+        }
+
         FillTextBox();
         FillCurrentLoc();
         checkVersion();
 
-        String getsex = "";
-        getsex = gender.getText().toString();
-        if (getsex.equals("Male")) {
-            sex.setImageResource(R.mipmap.avatar1);
-        }
-        else{
-            sex.setImageResource(R.mipmap.avatar2);
-        }
-
+        databaseHelper = new DatabaseHelper (this);
     }
-
 
     private void choosePicture() {
         Intent intent = new Intent();
@@ -410,12 +414,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             dtrdb = connectionClass(DtrConnect.un.toString(), DtrConnect.pass.toString(), DtrConnect.db.toString(), DtrConnect.ip.toString());
             if (dtrdb == null ) {
+                String memcodeTXT = memcode.getText().toString();
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date datein = format.parse(datetime.getText().toString());
+                String spec_location = result.getText().toString();
+                String current_status = "True";
+                int stat = 0;
 
-                status.setTextColor(Color.RED);
-                status.setText("app_Response: No Internet Connection. Data not saved");
+
+                assert datein != null;
+                Boolean checkinsertdata = databaseHelper.adduserdata(memcodeTXT, datein, spec_location, current_status,stat);
+                if (checkinsertdata){
+                    status.setTextColor(Color.RED);
+                    status.setText("Saved offline");}
+                else{
+                    status.setTextColor(Color.RED);
+                    status.setText("Error");
+                }
 
             } else {
-
                             String sql = "INSERT INTO location_logs (memcode,log_date_time,specify_location,current_status) VALUES ('" + memcode.getText() + "','" + datetime.getText() + "','" + result.getText() + "','True')";
                             stmt = dtrdb.createStatement();
                             stmt.executeUpdate(sql);
@@ -433,9 +450,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             dtrdb = connectionClass(DtrConnect.un.toString(), DtrConnect.pass.toString(), DtrConnect.db.toString(), DtrConnect.ip.toString());
             if (dtrdb == null) {
+                String memcodes = memcode.getText().toString();
+                String currentdate = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+                String prevdate = (log_Date.getText().toString());
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date newDate = format.parse(prevdate);
+                format = new SimpleDateFormat("yyyy-MM-dd");
+                String prevdates = format.format(newDate);
 
-                status.setTextColor(Color.RED);
-                status.setText("app_Response: No Internet Connection. Data not saved");
+                String current_status = "False";
+
+                if (prevdates.equals(currentdate)) {
+                    Boolean updateinsertdata = databaseHelper.updateuserdata(memcodes,currentdate,current_status);
+                    if (updateinsertdata) {
+                        status.setTextColor(Color.RED);
+                        status.setText("Saved offline");
+                    } else {
+                        status.setTextColor(Color.RED);
+                        status.setText("Error");
+                    }
+                }
+                else{
+                    Boolean updateinsertdata = databaseHelper.updateuserdata(memcodes,currentdate,current_status);
+                    if (updateinsertdata) {
+                        status.setTextColor(Color.RED);
+                        status.setText("Saved offline");
+                    } else {
+                        status.setTextColor(Color.RED);
+                        status.setText("Error");
+                    }
+                }
 
             } else {
 
@@ -478,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 try {
-                    memcode.setText(rs.getString("memcode"));
+                     memcode.setText(rs.getString("memcode"));
                     division.setText(rs.getString("division"));
                     if(rs.getString("gender").equals("M")) {
                         gender.setText("Male");

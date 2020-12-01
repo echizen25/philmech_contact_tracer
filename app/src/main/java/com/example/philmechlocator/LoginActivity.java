@@ -138,7 +138,9 @@ public class LoginActivity extends AppCompatActivity {
                         });
                         z = "Success";
 
-                        sessionManager.createLoginSession(username,password);
+                    String memcodes = rs.getString("memcode");
+                    String genders = rs.getString("gender");
+                        sessionManager.createLoginSession(username,password,memcodes,genders);
 
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

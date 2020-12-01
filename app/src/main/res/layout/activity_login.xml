@@ -4,17 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity"
-    android:orientation="vertical"
+    android:background="@drawable/background"
     android:gravity="center"
+    android:orientation="vertical"
     android:padding="16dp"
-    android:background="@drawable/trial"
-    >
+    tools:context=".LoginActivity">
 
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
 
         android:background="#00FFFFFF"
@@ -26,27 +25,29 @@
         android:textStyle="bold"
         android:typeface="normal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/usernamelogin"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/usernamelogin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.628" />
+        app:layout_constraintVertical_bias="0.683" />
 
-    <EditText
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/usernamelogin"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
         android:background="@drawable/bg_outline_rectangle"
         android:drawableLeft="@drawable/ic_person"
         android:drawablePadding="16dp"
         android:hint="Username"
+        android:visibility="visible"
         android:padding="12dp"
         android:textColor="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        tools:layout_editor_absoluteX="16dp" />
+        app:endIconMode="clear_text"
+        app:layout_constraintBottom_toTopOf="@+id/passwordlogin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-    <EditText
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/passwordlogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -55,6 +56,7 @@
         android:drawableLeft="@drawable/ic_baseline_vpn_key_24"
         android:drawablePadding="16dp"
         android:hint="Password"
+        app:endIconMode="password_toggle"
         android:inputType="textPassword"
         android:padding="12dp"
         android:textColor="#FFFFFF"
@@ -70,15 +72,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_marginBottom="16dp"
         android:background="@android:color/holo_green_light"
-
         android:text="Login"
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/passwordlogin"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="@+id/passwordlogin" />
+        app:layout_constraintStart_toStartOf="@+id/passwordlogin"
+        app:layout_constraintTop_toBottomOf="@+id/passwordlogin" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

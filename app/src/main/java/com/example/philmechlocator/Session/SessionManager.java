@@ -27,6 +27,10 @@ public class SessionManager {
 
     public static final String KEY_PASSWORD = "password";
 
+    public static final String KEY_MEM = "memcode";
+
+    public static final String KEY_GENDER = "gender";
+
 
     public SessionManager (Context context){
         this._context = context;
@@ -34,12 +38,15 @@ public class SessionManager {
         editor = pref.edit();
     }
 
-    public void createLoginSession(String username, String password){
+    public void createLoginSession(String username, String password, String memcodes, String genders){
         editor.putBoolean(IS_LOGIN,true);
 
         editor.putString(KEY_USERNAME, username);
 
         editor.putString(KEY_PASSWORD, password);
+        editor.putString(KEY_MEM, memcodes);
+
+        editor.putString(KEY_GENDER, genders);
 
         editor.commit();
     }
@@ -64,6 +71,10 @@ public class SessionManager {
         user.put(KEY_USERNAME, pref.getString(KEY_USERNAME,null));
 
         user.put(KEY_PASSWORD, pref.getString(KEY_PASSWORD,null));
+
+        user.put(KEY_MEM, pref.getString(KEY_MEM,null));
+
+        user.put(KEY_GENDER, pref.getString(KEY_GENDER,null));
 
         return user;
     }
